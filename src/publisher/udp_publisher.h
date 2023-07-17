@@ -1,5 +1,5 @@
-#ifndef LIRX_TRAINING_PUBLISHER_UDPPUBLISHER_H
-#define LIRX_TRAINING_PUBLISHER_UDPPUBLISHER_H
+#ifndef LIRX_TRAINING_PUBLISHER_UDP_PUBLISHER_H
+#define LIRX_TRAINING_PUBLISHER_UDP_PUBLISHER_H
 
 #include "ipublisher.h"
 template <typename DataType>
@@ -15,4 +15,4 @@ class UDPPublisher : public IPublisher<DataType> {
   int m_socket = 0;
 };
 
-#endif  // LIRX_TRAINING_PUBLISHER_UDPPUBLISHER_H
+#endif  // LIRX_TRAINING_PUBLISHER_UDP_PUBLISHER_H
