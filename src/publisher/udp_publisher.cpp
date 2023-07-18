@@ -29,7 +29,7 @@ void UDPPublisher<DataType>::PublishOneRow() {
   int length = sendto(this->m_socket, buf, strlen(buf), 0,
                       (struct sockaddr *)&(this->m_remote_addr),
                       sizeof(this->m_remote_addr));
-  printf("Send Message%s\n", buf);
+  // printf("Send Message%s\n", buf);
 }
 
 template class UDPPublisher<XyMarketData>;

@@ -5,7 +5,8 @@
 #include "data_source/data_source.h"
 #include "publisher/ipublisher.h"
 #include "publisher/udp_publisher.h"
-#include "server/iserver.h"
+// #include "server/iserver.h"
+#include "server/server.h"
 
 int main(int argc, char* argv[]) {
   // DataSource data_source("Market", 10);
@@ -30,7 +31,8 @@ int main(int argc, char* argv[]) {
   std::string mode(argv[1]);
   std::string s_speed(argv[2]);
 
-  IServer server_instance(mode, stoi(s_speed), 10, 8080);
+  Server server_instance(mode, stoi(s_speed), 10);
+  // IServer server_instance(mode, "Market", stoi(s_speed), 10);
   server_instance.start();
   return 0;
 }

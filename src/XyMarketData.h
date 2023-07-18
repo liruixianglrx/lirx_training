@@ -1,5 +1,5 @@
 #pragma pack(1)
-
+// #include <stdint.h>
 /**
  * 共享内存元数据
  * 共享内存中为二维表或三维表数据
