@@ -4,9 +4,14 @@
 #include <thread>
 #define BUFFER_SIZE 1024
 
-IServer::IServer(const std::string &data_type, const int speed, int source_size,
-                 int server_port)
-    : m_data_type(data_type), m_speed(speed), m_server_port(server_port) {}
+IServer::IServer(const std::string &mode, const std::string &data_type,
+                 const int speed, int source_size)
+    : m_data_type(data_type), m_speed(speed), m_mode(mode) {
+  if (mode == "easy")
+    m_server_port = 8080;
+  else
+    m_server_port = 8081;
+}
 
 IServer::~IServer() {}
 
@@ -28,7 +33,7 @@ void IServer::start() {
   bind(m_listen_fd, (struct sockaddr *)&m_servaddr, sizeof(m_servaddr));
 
   int client_fd;
-  std::string stock_code, date, data_type;
+  std::string stock_code, date, data_type, client_port;
   struct sockaddr_in client_addr;
   socklen_t client_addr_len = sizeof(client_addr);
 
@@ -48,18 +53,47 @@ void IServer::start() {
       exit(0);
     } else {
       std::stringstream sstream(buf);
-      sstream >> stock_code >> date >> data_type;
-      // printf("%s\n", buf);
-      send(client_fd, "lrx7777", 6, 0);
-      std::thread new_thread(worker, client_fd, stock_code, date, data_type);
+      sstream >> stock_code >> date >> data_type >> client_port;
+      printf("%s\n", buf);
+      client_addr.sin_port = htons(stoi(client_port));
+      std::thread new_thread(worker, client_addr, stock_code, date, data_type,
+                             m_mode);
 
       new_thread.detach();
     }
   }
 }
 
-void IServer::worker(int client_fd, const std::string &stock_code,
-                     const std::string &date, const std::string &data_type) {
+void IServer::worker(struct sockaddr_in client_addr,
+                     const std::string &stock_code, const std::string &date,
+                     const std::string &data_type, const std::string &mode) {
   DataSource *new_data_source = new DataSource(data_type, 10);
+  // get client's ip and port
+  char client_ip[INET_ADDRSTRLEN];
+  inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, sizeof(client_ip));
+  int client_port = ntohs(client_addr.sin_port);
+
+  printf("port is %d", client_port);
+
+  if (data_type == "Market") {
+    if (mode == "easy") {
+      // IPublisher<XyMarketData> *publisher =
+      //     new TCPPublisher<XyMarketData>(client_ip, client_port);
+
+    } else {
+      IPublisher<XyMarketData> *publisher =
+          new UDPPublisher<XyMarketData>(client_ip, client_port);
+      new_data_source->readNDataFromFile(5);
+      unsigned char *tdata = new_data_source->getData();
+      printf("%s \n", tdata);
+      publisher->TranlateData(tdata);
+      for (int i = 0; i < 30; i++) publisher->PublishOneRow();
+      // for (int i = 0; i < 5; i++) {
+      //   unsigned char* tdata = data_source.getData();
+      //   ipub->TranlateData(tdata);
+      //   for (int i = 0; i < 30; i++) ipub->PublishOneRow();
+      // }
+    }
+  }
   // send(client_fd, "lrx7777", 6, 0);
 }
