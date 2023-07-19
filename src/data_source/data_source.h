@@ -14,36 +14,28 @@
 #include <string>
 #include <vector>
 
+#include "../OrderBook.h"
+#include "../XYData.h"
+#include "../XyMarketData.h"
+
 #define MARKET_PATH "/workspace/data/Market"
 class DataSource {
  public:
-  DataSource(std::string type, int bsize);
+  DataSource(std::string stock_code, int date, std::string data_type);
   ~DataSource();
-  void readDataFromFile(const std::string& type, const std::string& code,
-                        int date);
 
-  // read N data files from designated folder
-  bool readNDataFromFile(int n);
+  bool HasNewData(int time);
 
-  unsigned char* getData();
-
-  int notSentSize();
+  unsigned char* getData(int time);
 
  private:
-  // TODO : static ?
-  std::vector<std::string> market_files;
-  // static std::vector<string> orderx_files;
+  int m_process_index, m_size;
+  int m_time;
+  int m_struct_size;
+  std::vector<unsigned char*> m_datas;
+  std::vector<int> m_times;
 
-  // store market data from read file
-  // circular queue
-  std::vector<unsigned char*> data_buffer;
-
-  // Which type of data,e.g. market,orderx,transx
-  // TODO:template function for different data_type?
-  std::string data_type;
-
-  int start_index, end_index, process_idx;
-  int buffer_size, buffer_capacity;
-  int date;
+  void readDataFromFile(std::string stock_code, int date,
+                        std::string data_type);
 };
 #endif  // LIRX_TRAINING_DATA_SOURCE_DATA_SOURCE

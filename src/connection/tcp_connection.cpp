@@ -1,27 +1,5 @@
 #include "tcp_connection.h"
 
-TCPConnection::TCPConnection(char *remote_ip, int remote_port, int port) {
-  m_socked = socket(AF_INET, SOCK_STREAM, 0);
-  if (m_socked < 0) {
-    perror("socket failed!");
-  }
-  // struct sockaddr_in local_addr;
-  memset(&m_local_addr, 0, sizeof(m_local_addr));
-  memset(&m_remote_addr, 0, sizeof(m_remote_addr));
-  m_local_addr.sin_family = AF_INET;
-  m_local_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  m_local_addr.sin_port = htons(port);
-
-  m_remote_addr.sin_family = AF_INET;
-  m_remote_addr.sin_addr.s_addr = inet_addr(remote_ip);
-  m_remote_addr.sin_port = htons(remote_port);
-
-  int ret =
-      bind(m_socked, (struct sockaddr *)&m_local_addr, sizeof(m_local_addr));
-  if (ret < 0) {
-    perror("bind failed !");
-  }
-}
 void TCPConnection::setConnect(char *remote_ip, int remote_port, int port) {
   m_socked = socket(AF_INET, SOCK_STREAM, 0);
   if (m_socked < 0) {

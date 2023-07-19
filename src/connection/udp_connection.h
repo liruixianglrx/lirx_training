@@ -16,8 +16,15 @@
 #define BUFFER_SIZE 1024
 class UDPConnection {
  public:
-  UDPConnection(char* remote_ip, int remote_port, int port);
+  UDPConnection() {}
+
+  UDPConnection(char* remote_ip, int remote_port, int port) {
+    setConnect(remote_ip, remote_port, port);
+  }
+
   ~UDPConnection() { closeConnection(); }
+
+  void setConnect(char* remote_ip, int remote_port, int port);
 
   int getLocalPort();
 

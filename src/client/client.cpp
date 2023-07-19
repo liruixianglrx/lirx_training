@@ -43,6 +43,8 @@ int main(int argc, char* argv[]) {
   char group[16] = "224.0.0.88";
   udp_connection.joinGroup(group);
 
+  TCPConnection tcp_connection(remote_ip, 0, 0);
+
   int tcp_port;
   std::string tmp_str;
   for (int i = 2; i < argc; i++) {

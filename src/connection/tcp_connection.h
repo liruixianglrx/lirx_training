@@ -17,7 +17,9 @@
 class TCPConnection {
  public:
   TCPConnection() {}
-  TCPConnection(char* remote_ip, int remote_port, int port);
+  TCPConnection(char* remote_ip, int remote_port, int port) {
+    setConnect(remote_ip, remote_port, port);
+  }
   ~TCPConnection() { closeConnection(); }
 
   void setConnect(char* remote_ip, int remote_port, int port);

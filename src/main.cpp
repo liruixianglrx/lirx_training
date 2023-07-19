@@ -32,6 +32,10 @@ int main(int argc, char* argv[]) {
   std::string s_speed(argv[2]);
 
   Server server_instance(mode, stoi(s_speed), 10);
+
+  if (!strcmp(argv[3], "y")) {
+    server_instance.SetDemo(true);
+  }
   // IServer server_instance(mode, "Market", stoi(s_speed), 10);
   server_instance.start();
   return 0;
