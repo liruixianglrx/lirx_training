@@ -1,6 +1,6 @@
 #include "udp_connection.h"
 
-void UDPConnection::setConnect(char *remote_ip, int remote_port, int port) {
+void UDPConnection::SetConnect(char *remote_ip, int remote_port, int port) {
   m_socked = socket(AF_INET, SOCK_DGRAM, 0);
   if (m_socked < 0) {
     perror("socket failed!");

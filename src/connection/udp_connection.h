@@ -19,12 +19,12 @@ class UDPConnection {
   UDPConnection() {}
 
   UDPConnection(char* remote_ip, int remote_port, int port) {
-    setConnect(remote_ip, remote_port, port);
+    SetConnect(remote_ip, remote_port, port);
   }
 
   ~UDPConnection() { closeConnection(); }
 
-  void setConnect(char* remote_ip, int remote_port, int port);
+  void SetConnect(char* remote_ip, int remote_port, int port);
 
   int getLocalPort();
 

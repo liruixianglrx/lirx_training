@@ -1,115 +1,76 @@
-#include "ipublisher.h"
-
-#include <cstring>
-#include <iostream>
-#include <string>
-
-#include "../XyMarketData.h"
+#include "udp_publisher.h"
 
 template <typename DataType>
-IPublisher<DataType>::IPublisher() {}
+IPublisher<DataType>::IPublisher(std::string stock_code, int date,
+                                 std::string data_type, int speed)
+    : m_speed(speed) {
+  this->m_data_source = new DataSource(stock_code, date, data_type);
+  m_pre_data = reinterpret_cast<DataType *>(m_data_source->getDataByIndex(0));
+  m_time = 80000000;
+}
 
 template <typename DataType>
 IPublisher<DataType>::~IPublisher() {}
 
 template <typename DataType>
-void IPublisher<DataType>::TranlateData(unsigned char* raw_data) {
-  m_data = reinterpret_cast<DataType*>(raw_data);
-  m_process_index = 0;
-  if constexpr (std::is_same<DataType, XyMarketData>()) {
-    m_size = 10;
-  } else {
-    m_size = -1;
-  }
-}
+void IPublisher<DataType>::Start() {
+  while (m_time <= 180000000) {
+    if (m_data_source->HasNewData(m_time)) {
+      unsigned char *raw_data = m_data_source->getData(m_time);  // delete
 
-template <typename DataType>
-std::string IPublisher<DataType>::ParseOneRow() {
-  m_process_index++;
-  static std::string prefix(25, '.');
-  if constexpr (std::is_same<DataType, XyMarketData>()) {
-    switch (m_process_index) {
-      case 1:
-        return prefix + "\nwind_code is: " + std::string(m_data->wind_code);
-      case 2:
-        return "code is : " + std::string(m_data->code);
-        // TODO: code has bug? first two bits were showing
-      case 3:
-        return "action_day is: " + std::to_string(m_data->action_day);
-      case 4:
-        return "trading_day is: " + std::to_string(m_data->trading_day);
-      case 5:
-        return "update_time is: " + std::to_string(m_data->update_time);
-      case 6:
-        return "status is: " + std::to_string(m_data->status);
-      case 7:
-        return "pre_close is: " + std::to_string(m_data->pre_close);
-      case 8:
-        return "open is: " + std::to_string(m_data->open);
-      case 9:
-        return "high is: " + std::to_string(m_data->high);
-      case 10:
-        return "low is: " + std::to_string(m_data->low);
-      case 11:
-        return "last_price is: " + std::to_string(m_data->last_price);
-      case 12:
-        return GetVectorReturn("ask_price", m_data->ask_price, 5);
-      case 13:
-        return GetVectorReturn("ask_vol", m_data->ask_vol, 5);
-      case 14:
-        return GetVectorReturn("bid_price", m_data->bid_price, 5);
-      case 15:
-        return GetVectorReturn("bid_volume", m_data->bid_volume, 5);
-      case 16:
-        return "num_trades is: " + std::to_string(m_data->num_trades);
-      case 17:
-        return "volume is: " + std::to_string(m_data->volume);
-      case 18:
-        return "turnover is: " + std::to_string(m_data->turnover);
-      case 19:
-        return "total_bid_vol is: " + std::to_string(m_data->total_bid_vol);
-      case 20:
-        return "total_ask_vol is: " + std::to_string(m_data->total_ask_vol);
-      case 21:
-        return "weighted_avg_bid_price is: " +
-               std::to_string(m_data->weighted_avg_bid_price);
-      case 22:
-        return "weighted_avg_ask_price is: " +
-               std::to_string(m_data->weighted_avg_ask_price);
-      case 23:
-        return "iopv is: " + std::to_string(m_data->iopv);
-      case 24:
-        return "yield_to_maturity is: " +
-               std::to_string(m_data->yield_to_maturity);
-      case 25:
-        return "high_limited is: " + std::to_string(m_data->high_limited);
-      case 26:
-        return "low_limited is: " + std::to_string(m_data->low_limited);
-      case 27:
-        return "prefix is: " + std::string(m_data->prefix);
-      case 28:
-        return "syl1 is: " + std::to_string(m_data->syl1);
-      case 29:
-        return "syl2 is: " + std::to_string(m_data->syl2);
-      case 30:
-        return "sd2 is: " + std::to_string(m_data->sd2);
+      m_data = reinterpret_cast<DataType *>(raw_data);
 
-      default:
-        break;
+      strcpy(m_send_buffer, GetSendData().c_str());
+
+      m_pre_data = m_data;
+
+      SendData(m_send_buffer);
+    }
+
+    if (m_demo) {
+      AddTime(m_speed * 1000);
+      std::this_thread::sleep_for(std::chrono::milliseconds(m_speed));
+    } else {
+      AddTime(m_speed);
+      std::this_thread::sleep_for(std::chrono::milliseconds(m_speed));
     }
   }
-  return nullptr;
+
+  strcpy(m_send_buffer, "\033[34mpublish over\033[37m");
+  SendData(m_send_buffer);
 }
 
 template <typename DataType>
-std::string IPublisher<DataType>::GetVectorReturn(const char* prefix,
-                                                  uint32_t* arr, int times) {
-  std::string result, sprefix(prefix);
-  for (int i = 0; i < times; i++) {
-    result += sprefix + char('1' + i) + " is: " + std::to_string(arr[i]) + "\n";
-  }
-  result.pop_back();
-  return result;
+void IPublisher<DataType>::AddTime(int time) {
+  int h1 = time / 10000000;
+  time = time % 10000000;
+  int min1 = time / 100000;
+  time = time % 100000;
+  int s1 = time / 1000;
+  int ms1 = time % 1000;
+
+  int h2 = m_time / 10000000;
+  m_time = m_time % 10000000;
+  int min2 = m_time / 100000;
+  m_time = m_time % 100000;
+  int s2 = m_time / 1000;
+  int ms2 = m_time % 1000;
+
+  ms1 += ms2;
+  s1 += s2;
+  min1 += min2;
+  h1 += h2;
+
+  s1 = s1 + (ms1 / 1000);
+  ms1 = ms1 % 1000;
+
+  min1 = min1 + (s1 / 60);
+  s1 = s1 % 60;
+
+  h1 = h1 + (min1 / 60);
+  min1 = min1 % 60;
+
+  m_time = h1 * 10000000 + min1 * 100000 + s1 * 1000 + ms1;
 }
 
 template class IPublisher<XyMarketData>;

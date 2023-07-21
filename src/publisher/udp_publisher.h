@@ -1,18 +1,29 @@
 #ifndef LIRX_TRAINING_PUBLISHER_UDP_PUBLISHER_H
 #define LIRX_TRAINING_PUBLISHER_UDP_PUBLISHER_H
 
+#include <unistd.h>
+
+#include "../connection/udp_connection.h"
 #include "ipublisher.h"
+
 template <typename DataType>
 class UDPPublisher : public IPublisher<DataType> {
  public:
-  UDPPublisher(const char *group_addr, int port);
+  UDPPublisher(char* remote_ip, int remote_port, int port,
+               std::string stock_code, int date, std::string data_type,
+               int speed);
   ~UDPPublisher();
 
-  void PublishOneRow() override;
+  virtual void EstablishConnection(char* remote_ip, int remote_port, int port);
 
  private:
-  struct sockaddr_in m_remote_addr;
-  int m_socket = 0;
+  UDPConnection* m_connection;
+
+  void GetVectorReturn(std::string& ans, uint32_t* arr, int times);
+
+  virtual std::string GetSendData();
+
+  virtual void SendData(char* buffer);
 };
 
 #endif  // LIRX_TRAINING_PUBLISHER_UDP_PUBLISHER_H

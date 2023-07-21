@@ -10,11 +10,6 @@ int main(int argc, char* argv[]) {
     exit(-1);
   }
   int remote_connect_port;
-  // int sockfd, remote_connect_port;
-  // struct sockaddr_in local_addr, servaddr;
-  // socklen_t local_addr_len = sizeof(local_addr);
-
-  // sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
   if (!std::strcmp(argv[1], "easy")) {
     remote_connect_port = 8080;
@@ -62,6 +57,5 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  // handshake.closeConnection();
   exit(0);
 }

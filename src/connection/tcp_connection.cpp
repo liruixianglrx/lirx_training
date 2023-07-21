@@ -1,11 +1,11 @@
 #include "tcp_connection.h"
 
-void TCPConnection::setConnect(char *remote_ip, int remote_port, int port) {
+void TCPConnection::SetConnect(char *remote_ip, int remote_port, int port) {
   m_socked = socket(AF_INET, SOCK_STREAM, 0);
   if (m_socked < 0) {
     perror("socket failed!");
   }
-  // struct sockaddr_in local_addr;
+
   memset(&m_local_addr, 0, sizeof(m_local_addr));
   memset(&m_remote_addr, 0, sizeof(m_remote_addr));
   m_local_addr.sin_family = AF_INET;

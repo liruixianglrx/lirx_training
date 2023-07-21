@@ -1,5 +1,5 @@
-#ifndef LIRX_TRAINING_DATA_SOURCE_DATA_SOURCE
-#define LIRX_TRAINING_DATA_SOURCE_DATA_SOURCE
+#ifndef LIRX_TRAINING_DATA_SOURCE_DATA_SOURCE_H
+#define LIRX_TRAINING_DATA_SOURCE_DATA_SOURCE_H
 
 #ifdef _WIN32
 #define HOME "Z:"
@@ -41,4 +41,4 @@ class DataSource {
   void readDataFromFile(std::string stock_code, int date,
                         std::string data_type);
 };
-#endif  // LIRX_TRAINING_DATA_SOURCE_DATA_SOURCE
+#endif  // LIRX_TRAINING_DATA_SOURCE_DATA_SOURCE_H

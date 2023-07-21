@@ -1,41 +1,43 @@
 #ifndef LIRX_TRAINING_PUBLISHER_IPUBLISHER_H
 #define LIRX_TRAINING_PUBLISHER_IPUBLISHER_H
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <unistd.h>
 
-#include <string>
+#include <thread>
+
+#include "../data_source/data_source.h"
+
 template <typename DataType>
 class IPublisher {
  public:
-  IPublisher();
-  virtual ~IPublisher();
-  void TranlateData(unsigned char* raw_data);
+  IPublisher(std::string stock_code, int date, std::string data_type,
+             int speed);
+  ~IPublisher();
 
-  // virtual void PublishOneRow() = 0;
-  virtual void PublishOneRow() {}
+  void SetDemo(bool demo) { m_demo = demo; }
+  void Start();
 
-  // this should be a private function;
-  std::string ParseOneRow();
+  virtual void EstablishConnection(char* remote_ip, int remote_port, int port) {
+  }
 
-  //  protected:
-  //   struct sockaddr_in m_remote_addr;
-  //   int m_socket = 0;
+  int GetEntryNum() { return m_data_source->m_entry_num; };
+
+ protected:
+  DataType *m_pre_data, *m_data;
 
  private:
-  std::string GetVectorReturn(const char* prefix, uint32_t* arr, int times);
-  // market data，The release of memory is done by DataSource
-  DataType* m_data;
+  virtual std::string GetSendData() { return nullptr; }
 
-  // get the newest row;
-  // std::string ParseOneRow();
+  virtual void SendData(char* buffer) {}
 
-  // m_size means how many rows of output a specific datatype has
-  // m_process_index means where the current line is
-  int m_size, m_process_index;
+  void AddTime(int time);
+
+  int m_speed;
+  int m_time;
+  DataSource* m_data_source;
+  char m_send_buffer[1024];
+
+  bool m_demo;
 };
 
 #endif  // LIRX_TRAINING_PUBLISHER_IPUBLISHER_H
