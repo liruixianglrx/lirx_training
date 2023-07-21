@@ -1,8 +1,7 @@
 #include "udp_publisher.h"
 
 template <typename DataType>
-IPublisher<DataType>::IPublisher(char *remote_ip, int remote_port, int port,
-                                 std::string stock_code, int date,
+IPublisher<DataType>::IPublisher(std::string stock_code, int date,
                                  std::string data_type, int speed)
     : m_speed(speed) {
   // this->m_connection = new UDPConnection(remote_ip, remote_port, port);
@@ -28,12 +27,19 @@ void IPublisher<DataType>::Start() {
 
     m_pre_data = m_data;
 
-    AddTime(m_speed);
+    // AddTime(m_speed);
 
     if (m_demo) {
+      AddTime(m_speed * 1000);
+      std::this_thread::sleep_for(std::chrono::milliseconds(m_speed));
+    } else {
+      AddTime(m_speed);
       std::this_thread::sleep_for(std::chrono::milliseconds(m_speed));
     }
   }
+
+  strcpy(m_send_buffer, "publish over");
+  SendData(m_send_buffer);
 }
 
 // template <typename DataType>

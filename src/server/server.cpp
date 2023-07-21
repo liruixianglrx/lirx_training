@@ -26,26 +26,26 @@ void Server::start() {
              sizeof(int));
 
   while (1) {
-    m_handshake.establishConnection(true);
+    int send_index = m_handshake.establishConnection(true);
 
     char client_ip[INET_ADDRSTRLEN];
     m_handshake.getRemoteIp(client_ip);
 
     char buf[BUFFER_SIZE];
-    m_handshake.receiveData(buf);
+    m_handshake.receiveData(buf, send_index);
 
     std::stringstream sstream(buf);
 
     std::string stock_code, date, data_type, client_port;
     sstream >> stock_code >> date >> data_type >> client_port;
 
-    // IPublisher<XyMarketData> *publisher = new UDPPublisher<XyMarketData>(
-    //     client_ip, stoi(client_port), 0, stock_code, stoi(date), data_type,
-    //     m_speed);
-    std::thread new_thread(Worker, client_ip, std::stoi(client_port),
-                           stock_code, stoi(date), data_type, m_mode, m_speed);
+    // strcpy(buf, "love lrx");
+    // m_handshake.sendData(buf, send_index);
 
-    // std::thread new_thread(publisher->Start);
+    std::thread new_thread(Worker, client_ip, std::stoi(client_port),
+                           stock_code, stoi(date), data_type, m_mode, m_speed,
+                           &m_handshake, send_index);
+
     new_thread.detach();
   }
 }
@@ -53,15 +53,25 @@ void Server::start() {
 void Server::Worker(char *client_ip, int client_port,
                     const std::string &stock_code, const int &date,
                     const std::string &data_type, const std::string &mode,
-                    int speed) {
-  IPublisher<XyMarketData> *publisher = new UDPPublisher<XyMarketData>(
-      client_ip, client_port, 0, stock_code, date, data_type, speed);
+                    int speed, TCPConnection *m_handshake, int send_index) {
+  IPublisher<XyMarketData> *publisher;
+  if (mode == "easy") {
+    publisher = new TCPPublisher<XyMarketData>(
+        m_handshake, send_index, stock_code, date, data_type, speed);
+  } else {
+    publisher = new UDPPublisher<XyMarketData>(
+        client_ip, client_port, 0, stock_code, date, data_type, speed);
+
+    publisher->EstablishConnection(client_ip, client_port, 0);
+  }
 
   publisher->SetDemo(m_demo);
 
-  publisher->EstablishConnection(client_ip, client_port, 0);
-
   publisher->Start();
+
+  // static_cast<TCPPublisher<XyMarketData> *>(publisher)
+  //     ->GetConnection()
+  //     ->sendData("buf", send_index);  // delete this line
 }
 
 bool Server::m_demo = false;

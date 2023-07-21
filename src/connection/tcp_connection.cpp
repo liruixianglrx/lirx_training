@@ -34,37 +34,42 @@ void TCPConnection::getRemoteIp(char *client_ip) {
   inet_ntop(AF_INET, &m_remote_addr.sin_addr, client_ip, sizeof(client_ip));
 }
 
-void TCPConnection::establishConnection(bool is_server) {
+int TCPConnection::establishConnection(bool is_server) {
   if (is_server) {
     if (listen(m_socked, 5) == -1) {
       perror("listen");
-      return;
+      return -1;
     }
 
-    if ((m_real_socked = accept(m_socked, NULL, NULL)) == -1) {
+    int client_fd;
+    if ((client_fd = accept(m_socked, NULL, NULL)) == -1) {
       perror("accept");
-      return;
+      return -1;
     }
+
+    m_real_socked.push_back(client_fd);
+    return m_real_socked.size() - 1;
   } else {
     if (connect(m_socked, (struct sockaddr *)&m_remote_addr,
                 sizeof(m_remote_addr)) == -1) {
       perror("connect");
-      return;
+      return -1;
     }
 
-    m_real_socked = m_socked;
+    m_real_socked.push_back(m_socked);
+    return 0;
   }
 }
 
-void TCPConnection::sendData(const char *buf) {
+void TCPConnection::sendData(const char *buf, int index) {
   printf("sending %s\n", buf);
-  if (send(m_real_socked, buf, BUFFER_SIZE, 0) == -1) {
+  if (send(m_real_socked[index], buf, BUFFER_SIZE, 0) == -1) {
     perror("send");
   }
 }
 
-int TCPConnection::receiveData(char *buf) {
-  int length = recv(m_real_socked, buf, BUFFER_SIZE, 0);
+int TCPConnection::receiveData(char *buf, int index) {
+  int length = recv(m_real_socked[index], buf, BUFFER_SIZE, 0);
 
   buf[length] = '\0';
 

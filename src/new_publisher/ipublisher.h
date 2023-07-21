@@ -10,8 +10,8 @@
 template <typename DataType>
 class IPublisher {
  public:
-  IPublisher(char* remote_ip, int remote_port, int port, std::string stock_code,
-             int date, std::string data_type, int speed);
+  IPublisher(std::string stock_code, int date, std::string data_type,
+             int speed);
   ~IPublisher();
 
   void SetDemo(bool demo) { m_demo = demo; }

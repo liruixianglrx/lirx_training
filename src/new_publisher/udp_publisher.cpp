@@ -4,8 +4,7 @@ template <typename DataType>
 UDPPublisher<DataType>::UDPPublisher(char* remote_ip, int remote_port, int port,
                                      std::string stock_code, int date,
                                      std::string data_type, int speed)
-    : IPublisher<DataType>(remote_ip, remote_port, port, stock_code, date,
-                           data_type, speed) {}
+    : IPublisher<DataType>(stock_code, date, data_type, speed) {}
 
 template <typename DataType>
 UDPPublisher<DataType>::~UDPPublisher() {}

@@ -1,11 +1,18 @@
-#include "udp_publisher.h"
+#include "tcp_publisher.h"
 
 template <typename DataType>
-TCPPublisher<DataType>::TCPPublisher(char* remote_ip, int remote_port, int port,
-                                     std::string stock_code, int date,
+TCPPublisher<DataType>::TCPPublisher(std::string stock_code, int date,
                                      std::string data_type, int speed)
-    : IPublisher<DataType>(remote_ip, remote_port, port, stock_code, date,
-                           data_type, speed) {}
+    : IPublisher<DataType>(stock_code, date, data_type, speed) {}
+
+template <typename DataType>
+TCPPublisher<DataType>::TCPPublisher(TCPConnection* tcp_connection,
+                                     int send_index, std::string stock_code,
+                                     int date, std::string data_type, int speed)
+    : IPublisher<DataType>(stock_code, date, data_type, speed),
+      m_send_index(send_index) {
+  m_connection = tcp_connection;
+}
 
 template <typename DataType>
 TCPPublisher<DataType>::~TCPPublisher() {}
@@ -50,13 +57,13 @@ std::string TCPPublisher<DataType>::GetSendData() {
            std::to_string(IPublisher<DataType>::m_data->last_price);
     ans += "\n";
     GetVectorReturn(ans, IPublisher<DataType>::m_data->ask_price, 5);
-    ans += "\n";
+    // ans += "\n";
     GetVectorReturn(ans, IPublisher<DataType>::m_data->ask_vol, 5);
-    ans += "\n";
+    // ans += "\n";
     GetVectorReturn(ans, IPublisher<DataType>::m_data->bid_price, 5);
-    ans += "\n";
+    // ans += "\n";
     GetVectorReturn(ans, IPublisher<DataType>::m_data->bid_volume, 5);
-    ans += "\n";
+    // ans += "\n";
     ans += "num_trades is: " +
            std::to_string(IPublisher<DataType>::m_data->num_trades);
     ans += "\n";
@@ -103,7 +110,7 @@ std::string TCPPublisher<DataType>::GetSendData() {
 
 template <typename DataType>
 void TCPPublisher<DataType>::SendData(char* buffer) {
-  m_connection->sendData(buffer);
+  m_connection->sendData(buffer, m_send_index);
 }
 
 template <typename DataType>

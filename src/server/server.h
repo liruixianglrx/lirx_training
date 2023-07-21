@@ -14,7 +14,7 @@
 #include "../connection/udp_connection.h"
 #include "../data_source/data_source.h"
 #include "../new_publisher/ipublisher.h"
-// #include "../new_publisher/tcp_publisher.h"
+#include "../new_publisher/tcp_publisher.h"
 #include "../new_publisher/udp_publisher.h"
 
 class Server {
@@ -49,7 +49,7 @@ class Server {
   static void Worker(char *client_ip, int client_port,
                      const std::string &stock_code, const int &date,
                      const std::string &data_type, const std::string &mode,
-                     int speed);
+                     int speed, TCPConnection *m_handshake, int send_index);
 };
 
 #endif  // LIRX_TRAINING_SERVER_SERVER_H

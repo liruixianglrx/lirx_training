@@ -9,16 +9,24 @@
 template <typename DataType>
 class TCPPublisher : public IPublisher<DataType> {
  public:
-  TCPPublisher(char* remote_ip, int remote_port, int port,
+  TCPPublisher(TCPConnection* tcp_connection, int send_index,
                std::string stock_code, int date, std::string data_type,
                int speed);
+
+  TCPPublisher(std::string stock_code, int date, std::string data_type,
+               int speed);
   ~TCPPublisher();
+
+  TCPConnection* GetConnection() { return m_connection; }
 
   virtual void EstablishConnection(char* remote_ip, int remote_port, int port);
 
  private:
   TCPConnection* m_connection;
-  // std::vector<int> m_highlight_rows;
+  int m_send_index;
+  std::vector<bool> m_highlight_rows;
+
+  void GetHighlightRows();
 
   void GetVectorReturn(std::string& ans, uint32_t* arr, int times);
 

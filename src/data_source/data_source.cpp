@@ -56,7 +56,7 @@ unsigned char* DataSource::getData(int time) {
   if (m_process_index == m_size - 1) {
     return m_datas[m_process_index];
   }
-  while (m_times[m_process_index + 1] <= time) {
+  while (m_process_index + 1 < m_size && m_times[m_process_index + 1] <= time) {
     m_process_index++;
   }
 

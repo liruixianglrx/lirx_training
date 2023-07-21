@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include <string>
+#include <vector>
 
 #define BUFFER_SIZE 1024
 class TCPConnection {
@@ -30,19 +31,22 @@ class TCPConnection {
 
   void getRemoteIp(char* client_ip);
 
-  void establishConnection(bool is_server);
+  int establishConnection(bool is_server);
 
-  void sendData(const char* buf);
+  void sendData(const char* buf, int index);
 
-  int receiveData(char* buf);
+  int receiveData(char* buf, int index);
 
   void closeConnection() {
     close(m_socked);
-    close(m_real_socked);
+    for (auto& socket : m_real_socked) {
+      close(socket);
+    }
   }
 
  private:
-  int m_socked, m_real_socked;
+  int m_socked;
+  std::vector<int> m_real_socked;
   struct sockaddr_in m_local_addr, m_remote_addr;
 };
 #endif  // LIRX_TRAINING_CONNECTION_TCPCONNECTION_H
