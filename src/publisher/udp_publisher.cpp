@@ -86,14 +86,14 @@ std::string UDPPublisher<DataType>::GetSendData() {
 
 template <typename DataType>
 void UDPPublisher<DataType>::SendData(char* buffer) {
-  m_connection->sendData(buffer);
+  m_connection->SendData(buffer);
 }
 
 template <typename DataType>
 void UDPPublisher<DataType>::GetVectorReturn(std::string& ans, uint32_t* arr,
                                              int times) {
-  for (int i = 0; i < times; i++) {
-    ans += std::to_string(arr[i]) + "\n";
+  for (int k = 0; k < times; k++) {
+    ans += std::to_string(arr[k]) + "\n";
   }
 }
 

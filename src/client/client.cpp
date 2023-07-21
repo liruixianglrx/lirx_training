@@ -19,18 +19,18 @@ int main(int argc, char* argv[]) {
   char remote_ip[16] = "127.0.0.1";
   TCPConnection handshake(remote_ip, remote_connect_port, 0);
 
-  int index = handshake.establishConnection(false);
+  int index = handshake.EstablishConnection(false);
   UDPConnection udp_connection(remote_ip, 0, 0);
-  int udp_port = udp_connection.getLocalPort();
+  int udp_port = udp_connection.GetLocalPort();
   char group[16] = "224.0.0.88";
-  udp_connection.joinGroup(group);
+  udp_connection.JoinGroup(group);
 
   int tcp_port;
-  tcp_port = handshake.getLocalPort();
+  tcp_port = handshake.GetLocalPort();
 
   std::string tmp_str;
-  for (int i = 2; i < argc; i++) {
-    tmp_str += argv[i];
+  for (int k = 2; k < argc; k++) {
+    tmp_str += argv[k];
     tmp_str.push_back(' ');
   }
 
@@ -42,17 +42,17 @@ int main(int argc, char* argv[]) {
   char buf[1024];
   strcpy(buf, tmp_str.c_str());
 
-  handshake.sendData(buf, index);
+  handshake.SendData(buf, index);
 
   while (true) {
     if (!std::strcmp(argv[1], "easy")) {
-      handshake.receiveData(buf, index);
+      handshake.ReceiveData(buf, index);
     } else {
-      udp_connection.receiveData(buf);
+      udp_connection.ReceiveData(buf);
     }
 
     if (!strcmp(buf, "\033[34mpublish over\033[37m")) {
-      handshake.closeConnection();
+      handshake.CloseConnection();
       break;
     }
   }

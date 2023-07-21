@@ -15,7 +15,7 @@ class Server {
   Server(const std::string &mode, const int speed, int source_size);
   virtual ~Server();
 
-  void start();
+  void Start();
 
   void SetDemo(bool demo) { m_demo = demo; }
 

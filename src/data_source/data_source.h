@@ -24,21 +24,32 @@ class DataSource {
   DataSource(std::string stock_code, int date, std::string data_type);
   ~DataSource();
 
+  // time时刻是否有数据更新
   bool HasNewData(int time);
 
-  unsigned char* getData(int time);
+  // 获得time时刻时最新的数据
+  unsigned char* GetData(int time);
 
-  unsigned char* getDataByIndex(int index) { return m_datas[index]; }
+  // 按照数据的index获得数据
+  unsigned char* GetDataByIndex(int index) { return m_datas[index]; }
   int m_entry_num;
 
  private:
+  // m_process_index,当前时刻处理的数据序号
+  // m_size，总共有多少个数据
   int m_process_index, m_size;
-  int m_time;
+
+  // 数据类型大小
   int m_struct_size;
+
+  // 保存文件中的所有数据
   std::vector<unsigned char*> m_datas;
+
+  // 文件中数据的时刻表
   std::vector<int> m_times;
 
-  void readDataFromFile(std::string stock_code, int date,
+  // 从文件中读取数据，指定股票代码，日期，数据类型
+  void ReadDataFromFile(std::string stock_code, int date,
                         std::string data_type);
 };
 #endif  // LIRX_TRAINING_DATA_SOURCE_DATA_SOURCE_H

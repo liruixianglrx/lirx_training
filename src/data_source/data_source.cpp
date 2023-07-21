@@ -10,12 +10,13 @@
 DataSource::DataSource(std::string stock_code, int date,
                        std::string data_type) {
   m_process_index = 0;
-  m_time = 80000000;
 
   if (data_type == "Market") {
     m_struct_size = sizeof(XyMarketData);
     m_entry_num = 30;
   }
+
+  // 将股票代码转为可读取的形式，e.g. 10010504 -> 010504.SH
   std::string file_name(stock_code);
   if (file_name[0] == '1') {
     file_name += ".SH";
@@ -24,36 +25,40 @@ DataSource::DataSource(std::string stock_code, int date,
   }
   file_name = file_name.substr(2);
 
-  readDataFromFile(file_name, date, data_type);
+  ReadDataFromFile(file_name, date, data_type);
 }
 
 DataSource::~DataSource() { delete[] m_datas[0]; }
 
-void DataSource::readDataFromFile(std::string stock_code, int date,
+void DataSource::ReadDataFromFile(std::string stock_code, int date,
                                   std::string data_type) {
   std::vector<unsigned char> buffer;
-  // read data from proper file
+  // 从文件中读取相应的数据
   XYData* pData = XYData::New(HOME);
   XYErrorCode error = pData->Read(data_type, stock_code, date, buffer);
-  // re-store it for future reinterpre_cast
+
+  // 将数据重新保存，便于未来进行类型转换
   unsigned char* tbuffer = new unsigned char[buffer.size()];
-  for (int i = 0; i < buffer.size(); i++) {
-    tbuffer[i] = buffer[i];
+  for (int k = 0; k < buffer.size(); k++) {
+    tbuffer[k] = buffer[k];
   }
 
   m_size = buffer.size() / m_struct_size;
   if (data_type == "Market") {
     XyMarketData* market_data;
-    for (int i = 0; i < m_size; i++) {
-      m_datas.push_back(tbuffer + i * m_struct_size);
+    for (int k = 0; k < m_size; k++) {
+      // 获得一个文件中所有data
+      m_datas.push_back(tbuffer + k * m_struct_size);
       market_data =
-          reinterpret_cast<XyMarketData*>(tbuffer + i * m_struct_size);
+          reinterpret_cast<XyMarketData*>(tbuffer + k * m_struct_size);
+      // 获取时刻表
       m_times.push_back(market_data->update_time);
     }
   }
 }
 
-unsigned char* DataSource::getData(int time) {
+// 获得time时刻时最新的数据
+unsigned char* DataSource::GetData(int time) {
   if (m_process_index == m_size - 1) {
     return m_datas[m_process_index];
   }
@@ -62,14 +67,9 @@ unsigned char* DataSource::getData(int time) {
   }
 
   return m_datas[m_process_index];
-  // for (int i = 0; i < m_size - 1; i++)
-  //   if (m_times[i] <= time && m_times[i + 1] > time) {
-  //     return m_dates[i];
-  //   }
-
-  // return m_dates[m_size - 1];
 }
 
+// time时刻是否有数据更新
 bool DataSource::HasNewData(int time) {
   if (m_process_index == m_size - 1) {
     return false;

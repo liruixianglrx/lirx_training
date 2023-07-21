@@ -18,23 +18,28 @@ class UDPConnection {
  public:
   UDPConnection() {}
 
+  // RAII自动申请和释放connection
+  // 如果port置0则系统自动分配port
   UDPConnection(char* remote_ip, int remote_port, int port) {
     SetConnect(remote_ip, remote_port, port);
   }
 
-  ~UDPConnection() { closeConnection(); }
+  ~UDPConnection() { CloseConnection(); }
 
+  // 设置连接
   void SetConnect(char* remote_ip, int remote_port, int port);
 
-  int getLocalPort();
+  // 返回本地的使用port
+  int GetLocalPort();
 
-  void joinGroup(char* group);
+  // 加入广播组
+  void JoinGroup(char* group);
 
-  int sendData(char* buf);
+  int SendData(char* buf);
 
-  int receiveData(char* buf);
+  int ReceiveData(char* buf);
 
-  void closeConnection() { close(m_socked); }
+  void CloseConnection() { close(m_socked); }
 
  private:
   int m_socked;

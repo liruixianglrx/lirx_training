@@ -24,7 +24,7 @@ template <typename DataType>
 void TCPPublisher<DataType>::EstablishConnection(char* remote_ip,
                                                  int remote_port, int port) {
   m_connection = new TCPConnection(remote_ip, remote_port, port);
-  m_connection->establishConnection(true);
+  m_connection->EstablishConnection(true);
 }
 
 template <typename DataType>
@@ -171,7 +171,7 @@ std::string TCPPublisher<DataType>::GetSendData() {
 
 template <typename DataType>
 void TCPPublisher<DataType>::SendData(char* buffer) {
-  m_connection->sendData(buffer, m_send_index);
+  m_connection->SendData(buffer, m_send_index);
 }
 
 template <typename DataType>
@@ -179,8 +179,8 @@ void TCPPublisher<DataType>::GetVectorReturn(const char* prefix,
                                              std::string& ans, uint32_t* arr,
                                              int times) {
   std::string sprefix(prefix);
-  for (int i = 0; i < times; i++) {
-    ans += sprefix + char('1' + i) + " is: " + std::to_string(arr[i]) + "\n";
+  for (int k = 0; k < times; k++) {
+    ans += sprefix + char('1' + k) + " is: " + std::to_string(arr[k]) + "\n";
   }
 }
 

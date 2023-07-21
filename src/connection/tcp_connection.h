@@ -18,26 +18,33 @@
 class TCPConnection {
  public:
   TCPConnection() {}
+
+  // RAII自动申请和释放connection
+  // 如果port置0则系统自动分配port
   TCPConnection(char* remote_ip, int remote_port, int port) {
-    setConnect(remote_ip, remote_port, port);
+    SetConnect(remote_ip, remote_port, port);
   }
-  ~TCPConnection() { closeConnection(); }
 
-  void setConnect(char* remote_ip, int remote_port, int port);
+  ~TCPConnection() { CloseConnection(); }
 
-  int getSocket() { return m_socked; }
+  // 设置连接
+  void SetConnect(char* remote_ip, int remote_port, int port);
 
-  int getLocalPort();
+  int GetSocket() { return m_socked; }
 
-  void getRemoteIp(char* client_ip);
+  // 返回本地的使用port
+  int GetLocalPort();
 
-  int establishConnection(bool is_server);
+  // 得到连接的远程IP
+  void GetRemoteIp(char* client_ip);
 
-  void sendData(const char* buf, int index);
+  int EstablishConnection(bool is_server);
 
-  int receiveData(char* buf, int index);
+  void SendData(const char* buf, int index);
 
-  void closeConnection() {
+  int ReceiveData(char* buf, int index);
+
+  void CloseConnection() {
     close(m_socked);
     for (auto& socket : m_real_socked) {
       close(socket);

@@ -21,6 +21,6 @@ int main(int argc, char* argv[]) {
     server_instance.SetDemo(true);
   }
 
-  server_instance.start();
+  server_instance.Start();
   return 0;
 }

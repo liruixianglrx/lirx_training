@@ -17,22 +17,22 @@ Server::Server(const std::string &mode, const int speed, int source_size)
 
 Server::~Server() {}
 
-void Server::start() {
+void Server::Start() {
   char ip[16] = "0.0.0.0";
   m_handshake.SetConnect(ip, 0, m_server_port);
 
-  int i = 1; /*允许重复使用本地址与套接字进行绑定*/
-  setsockopt(m_handshake.getSocket(), SOL_SOCKET, SO_REUSEADDR, &i,
+  int k = 1; /*允许重复使用本地址与套接字进行绑定*/
+  setsockopt(m_handshake.GetSocket(), SOL_SOCKET, SO_REUSEADDR, &k,
              sizeof(int));
 
   while (true) {
-    int send_index = m_handshake.establishConnection(true);
+    int send_index = m_handshake.EstablishConnection(true);
 
     char client_ip[INET_ADDRSTRLEN];
-    m_handshake.getRemoteIp(client_ip);
+    m_handshake.GetRemoteIp(client_ip);
 
     char buf[BUFFER_SIZE];
-    m_handshake.receiveData(buf, send_index);
+    m_handshake.ReceiveData(buf, send_index);
 
     std::stringstream sstream(buf);
 
