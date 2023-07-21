@@ -6,6 +6,7 @@ IPublisher<DataType>::IPublisher(std::string stock_code, int date,
     : m_speed(speed) {
   // this->m_connection = new UDPConnection(remote_ip, remote_port, port);
   this->m_data_source = new DataSource(stock_code, date, data_type);
+  m_pre_data = reinterpret_cast<DataType *>(m_data_source->getDataByIndex(0));
   m_time = 80000000;
 }
 
@@ -22,10 +23,12 @@ void IPublisher<DataType>::Start() {
 
       strcpy(m_send_buffer, GetSendData().c_str());
 
+      m_pre_data = m_data;
+
       SendData(m_send_buffer);
     }
 
-    m_pre_data = m_data;
+    // m_pre_data = m_data;
 
     // AddTime(m_speed);
 
@@ -38,7 +41,7 @@ void IPublisher<DataType>::Start() {
     }
   }
 
-  strcpy(m_send_buffer, "publish over");
+  strcpy(m_send_buffer, "\033[34mpublish over\033[37m");
   SendData(m_send_buffer);
 }
 

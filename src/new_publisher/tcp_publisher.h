@@ -24,11 +24,12 @@ class TCPPublisher : public IPublisher<DataType> {
  private:
   TCPConnection* m_connection;
   int m_send_index;
-  std::vector<bool> m_highlight_rows;
+  std::vector<int> m_diffs;
 
-  void GetHighlightRows();
+  void GetRowDiffs();
 
-  void GetVectorReturn(std::string& ans, uint32_t* arr, int times);
+  void GetVectorReturn(const char* prefix, std::string& ans, uint32_t* arr,
+                       int times);
 
   virtual std::string GetSendData();
 

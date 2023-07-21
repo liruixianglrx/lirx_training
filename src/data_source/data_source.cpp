@@ -14,6 +14,7 @@ DataSource::DataSource(std::string stock_code, int date,
 
   if (data_type == "Market") {
     m_struct_size = sizeof(XyMarketData);
+    m_entry_num = 30;
   }
   std::string file_name(stock_code);
   if (file_name[0] == '1') {

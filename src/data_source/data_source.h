@@ -28,6 +28,9 @@ class DataSource {
 
   unsigned char* getData(int time);
 
+  unsigned char* getDataByIndex(int index) { return m_datas[index]; }
+  int m_entry_num;
+
  private:
   int m_process_index, m_size;
   int m_time;

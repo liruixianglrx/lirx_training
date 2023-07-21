@@ -21,6 +21,8 @@ class IPublisher {
   virtual void EstablishConnection(char* remote_ip, int remote_port, int port) {
   }
 
+  int GetEntryNum() { return m_data_source->m_entry_num; };
+
  protected:
   DataType *m_pre_data, *m_data;
 

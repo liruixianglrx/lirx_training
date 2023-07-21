@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
       udp_connection.receiveData(buf);
     }
 
-    if (!strcmp(buf, "publish over")) {
+    if (!strcmp(buf, "\033[34mpublish over\033[37m")) {
       handshake.closeConnection();
       break;
     }
